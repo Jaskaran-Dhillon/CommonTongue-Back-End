@@ -7,9 +7,6 @@ const bodyParser = require("body-parser");
 const rateLimit = require("express-rate-limit");
 const sequelize = require("./util/database");
 
-//NOTE: Run with cmd terminal to use nodemon
-const app = express();
-
 const limiter = rateLimit({
 	windowMs: 1 * 60 * 1000, 
 	max: 20, 
@@ -20,6 +17,8 @@ const limiter = rateLimit({
   }
 });
 
+const app = express();
+
 sequelize
   .sync()
   .then((result) => {
@@ -29,8 +28,8 @@ sequelize
     console.log("Failed to sync", e);
   });
 
-app.use(cors());
 app.options("*", cors());
+app.use(cors());
 app.use(bodyParser.json());
 app.use(limiter);
 app.use((req, res, next) => {
