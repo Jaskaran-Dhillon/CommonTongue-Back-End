@@ -28,4 +28,5 @@ Steps:\
 
 ### `Note #2`: The env var `NODE_ENV` must be `production` when deploying.
 
+### Server URL: https://commontongue-back-end-production.up.railway.app/
 
