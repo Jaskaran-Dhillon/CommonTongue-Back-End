@@ -41,10 +41,6 @@ const limiter = rateLimit({
 
 app.use(bodyParser.json());
 app.use(limiter);
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   next();
-// });
 
 app.use("/user", user);
 app.use("/translate", translate);
