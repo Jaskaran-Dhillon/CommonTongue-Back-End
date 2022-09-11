@@ -7,17 +7,18 @@ const bodyParser = require("body-parser");
 const rateLimit = require("express-rate-limit");
 const sequelize = require("./util/database");
 
-const limiter = rateLimit({
-	windowMs: 1 * 60 * 1000, 
-	max: 20, 
-	standardHeaders: true, 
-	legacyHeaders: false, 
-  handler: (req, res) => {
-    res.status(429).send({ error: "Request limit reached" });
-  }
-});
-
 const app = express();
+
+app.options("*", cors());
+app.use(
+  cors({
+    allowedHeaders: ["authorization", "Content-Type"], 
+    exposedHeaders: ["authorization"], 
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    preflightContinue: false,
+  })
+);
 
 sequelize
   .sync()
@@ -28,14 +29,22 @@ sequelize
     console.log("Failed to sync", e);
   });
 
-app.options("*", cors());
-app.use(cors());
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).send({ error: "Request limit reached" });
+  },
+});
+
 app.use(bodyParser.json());
 app.use(limiter);
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
 
 app.use("/user", user);
 app.use("/translate", translate);
